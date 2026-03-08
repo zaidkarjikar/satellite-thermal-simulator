@@ -30,3 +30,21 @@ class Orbit:
         """
         orbital_period = 2 * math.pi * math.sqrt(self.orbital_radius**3 / EARTH_MU)
         return orbital_period
+    
+    def calculate_eclipse_fraction(self):
+        """Calculate the fraction of the orbit time spent in Earth's shadow.
+        
+        Simple cylindrical shadow approximation assuming:
+        - Circular orbit
+        - beta angle = 0° (worst-case eclipse)
+        - Sun at infinite distance
+
+        Returns:
+            float: Fraction of orbit time spent in shadow (0 to 1).
+        """
+        ratio = (EARTH_RADIUS * 1000) / self.orbital_radius
+        ratio = max(-1.0, min(1.0, ratio))
+        
+        eclipse_fraction = (1 / math.pi) * math.asin(ratio)
+        return eclipse_fraction
+    
