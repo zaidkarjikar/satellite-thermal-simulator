@@ -1,5 +1,6 @@
 import pytest
 from src.orbit import Orbit
+from config.defaults import EARTH_RADIUS
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -24,6 +25,18 @@ def low_orbit():
 def geo_orbit():
     """Orbit instance at GEO altitude (35786 km)."""
     return Orbit(altitude_km=35786)
+
+# ---------------------------------------------------------------------------
+# orbit initialization
+# ---------------------------------------------------------------------------
+
+def test_orbital_radius_calculation():
+    """Orbital radius should equal Earth radius + altitude."""
+    orbit = Orbit(altitude_km=408)
+
+    expected = (EARTH_RADIUS + 408) * 1000
+
+    assert orbit.orbital_radius == pytest.approx(expected)
 
 # ---------------------------------------------------------------------------
 # calculate_orbital_period
@@ -99,6 +112,12 @@ def test_eclipse_fraction_unaffected_by_inclination():
     o1 = Orbit(altitude_km=408, inclination_deg=0)
     o2 = Orbit(altitude_km=408, inclination_deg=90)
     assert o1.calculate_eclipse_fraction() == o2.calculate_eclipse_fraction()
+
+def test_eclipse_fraction_extreme_altitude():
+    """At extremely high altitude eclipse fraction should approach zero."""
+    orbit = Orbit(altitude_km=1_000_000)
+
+    assert orbit.calculate_eclipse_fraction() < 0.01
 
 # ---------------------------------------------------------------------------
 # sunlight_duration
