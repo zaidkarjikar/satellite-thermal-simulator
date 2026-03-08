@@ -68,4 +68,23 @@ class Orbit:
         sunlight_duration = (1 - eclipse_fraction) * orbital_period
         return sunlight_duration
     
+    def calculate_eclipse_duration(self):
+        """Calculate the time spent in Earth's shadow per orbit, in seconds.
+        
+        Uses the eclipse fraction and orbital period to determine the
+        duration the satellite remains in Earth's shadow in each orbit.
+        
+        Assumptions:
+        - Circular orbit
+        - beta angle = 0° (worst-case eclipse)
+        - Sun at infinite distance
+        
+        Returns:
+            float: Duration in seconds the satellite is in Earth's shadow.
+        """
+        eclipse_fraction = self.calculate_eclipse_fraction()
+        orbital_period = self.calculate_orbital_period()
+
+        eclipse_duration = eclipse_fraction * orbital_period
+        return eclipse_duration
     
