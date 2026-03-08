@@ -100,3 +100,48 @@ def test_eclipse_fraction_unaffected_by_inclination():
     o2 = Orbit(altitude_km=408, inclination_deg=90)
     assert o1.calculate_eclipse_fraction() == o2.calculate_eclipse_fraction()
 
+# ---------------------------------------------------------------------------
+# sunlight_duration
+# ---------------------------------------------------------------------------
+
+def test_sunlight_duration_iss_known_value(iss_orbit):
+    """At ISS altitude, sunlight duration should be approximately 56-57 minutes (3390 seconds)."""
+    assert iss_orbit.calculate_sunlight_duration() == pytest.approx(3394, abs=60)
+
+def test_sunlight_plus_eclipse_equals_orbital_period(iss_orbit):
+    """Sunlight duration + eclipse duration must equal the orbital period."""
+    sunlight_duration = iss_orbit.calculate_sunlight_duration()
+    eclipse_duration = iss_orbit.calculate_eclipse_fraction() * iss_orbit.calculate_orbital_period()
+    orbital_period = iss_orbit.calculate_orbital_period()
+
+    assert sunlight_duration + eclipse_duration == pytest.approx(orbital_period, rel=1e-3)
+
+def test_sunlight_duration_increases_with_altitude(high_orbit, low_orbit):
+    """Higher altitude should result in longer sunlight duration."""
+    assert high_orbit.calculate_sunlight_duration() > low_orbit.calculate_sunlight_duration()
+
+def test_sunlight_duration_positive(iss_orbit):
+    """Sunlight duration must always be positive."""
+    assert iss_orbit.calculate_sunlight_duration() > 0
+
+def test_sunlight_duration_less_than_orbital_period(iss_orbit):
+    """Sunlight duration cannot exceed the orbital period."""
+    assert iss_orbit.calculate_sunlight_duration() < iss_orbit.calculate_orbital_period()
+
+def test_sunlight_duration_geo(geo_orbit):
+    """At GEO altitude, sunlight duration should be about 95% of the orbit (81800 seconds)."""
+    assert geo_orbit.calculate_sunlight_duration() == pytest.approx(81800, abs=1000)
+
+def test_sunlight_duration_unaffected_by_inclination():
+    """Sunlight duration should not depend on inclination in this model."""
+    o1 = Orbit(altitude_km=408, inclination_deg=0)
+    o2 = Orbit(altitude_km=408, inclination_deg=90)
+
+    assert o1.calculate_sunlight_duration() == o2.calculate_sunlight_duration()
+
+def test_orbit_lighting_identity(iss_orbit):
+    """Sunlight fraction + eclipse fraction must equal 1."""
+    sunlight_fraction = iss_orbit.calculate_sunlight_duration() / iss_orbit.calculate_orbital_period()
+    eclipse_fraction = iss_orbit.calculate_eclipse_fraction()
+
+    assert sunlight_fraction + eclipse_fraction == pytest.approx(1.0, rel=1e-6)

@@ -44,7 +44,28 @@ class Orbit:
         """
         ratio = (EARTH_RADIUS * 1000) / self.orbital_radius
         ratio = max(-1.0, min(1.0, ratio))
-        
+
         eclipse_fraction = (1 / math.pi) * math.asin(ratio)
         return eclipse_fraction
+    
+    def calculate_sunlight_duration(self):
+        """Calculate the time spent in sunlight per orbit, in seconds.
+        
+        Uses the eclipse fraction and orbital period to determine the
+        duration the satellite remains illuminated by the Sun in each orbit.
+        
+        Assumptions:
+        - Circular orbit
+        - beta angle = 0° (worst-case eclipse)
+        - Sun at infinite distance
+        
+        Returns:
+            float: Duration in seconds the satellite is illuminated by the Sun.
+        """
+        eclipse_fraction = self.calculate_eclipse_fraction()
+        orbital_period = self.calculate_orbital_period()
+        
+        sunlight_duration = (1 - eclipse_fraction) * orbital_period
+        return sunlight_duration
+    
     
